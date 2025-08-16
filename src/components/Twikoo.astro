@@ -1,0 +1,22 @@
+---
+// Twikoo comment component (CDN)
+// Props: envId (required), path (defaults to current pathname)
+interface Props {
+  envId: string;
+  path?: string;
+}
+const { envId, path = Astro.url.pathname } = Astro.props as Props;
+---
+<div id="twikoo" class="w-full" />
+<script src="https://cdn.staticfile.net/twikoo/1.6.40/twikoo.all.min.js" defer></script>
+<script is:inline>
+  window.addEventListener('load', () => {
+    if (!window.twikoo || !{JSON.stringify(envId)}) return;
+    // @ts-ignore
+    window.twikoo.init({
+      envId: {JSON.stringify(envId)},
+      el: '#twikoo',
+      path: {JSON.stringify(path)},
+    });
+  });
+</script>

@@ -1,0 +1,32 @@
+---
+// Waline comment component (CDN)
+// Props: serverURL (required), path (defaults to current pathname), lang, dark
+interface Props {
+  serverURL: string;
+  path?: string;
+  lang?: string;
+  dark?: string | boolean;
+}
+const { serverURL, path = Astro.url.pathname, lang = 'zh-CN', dark = 'html.dark' } = Astro.props as Props;
+---
+<div id="waline" class="w-full" />
+<link rel="stylesheet" href="https://unpkg.com/@waline/client@v3/dist/waline.css" />
+<script is:inline>
+  (async () => {
+    if (!{JSON.stringify(serverURL)}) return;
+    const script = document.createElement('script');
+    script.src = 'https://unpkg.com/@waline/client@v3/dist/waline.js';
+    script.defer = true;
+    script.onload = () => {
+      // @ts-ignore
+      window.Waline?.init?.({
+        el: '#waline',
+        serverURL: {JSON.stringify(serverURL)},
+        lang: {JSON.stringify(lang)},
+        dark: {JSON.stringify(dark)},
+        path: {JSON.stringify(path)},
+      });
+    };
+    document.head.appendChild(script);
+  })();
+</script>

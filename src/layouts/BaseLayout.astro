@@ -1,0 +1,126 @@
+---
+import '@/styles/styles.css';
+interface Props {
+  title?: string;
+  description?: string;
+  image?: string;
+  isPost?: boolean;
+  publishDate?: string | Date;
+  updatedDate?: string | Date;
+  tags?: string[];
+}
+const {
+  title = '我的博客',
+  description = '个人博客',
+  image = '/og-image.png',
+  isPost = false,
+  publishDate,
+  updatedDate,
+  tags = [],
+} = Astro.props as Props;
+
+const site = Astro.site?.toString() ?? 'https://example.com';
+const canonical = new URL(Astro.url.pathname, site).toString();
+const ogType = isPost ? 'article' : 'website';
+const ogImage = new URL(image, site).toString();
+const jsonLd = isPost
+  ? {
+      '@context': 'https://schema.org',
+      '@type': 'BlogPosting',
+      headline: title,
+      description,
+      mainEntityOfPage: canonical,
+      image: ogImage,
+      datePublished: publishDate ? new Date(publishDate).toISOString() : undefined,
+      dateModified: updatedDate ? new Date(updatedDate).toISOString() : undefined,
+      keywords: (tags || []).join(', '),
+      author: { '@type': 'Person', name: 'Author' },
+      publisher: {
+        '@type': 'Organization',
+        name: '我的博客',
+        logo: { '@type': 'ImageObject', url: ogImage },
+      },
+    }
+  : {
+      '@context': 'https://schema.org',
+      '@type': 'WebSite',
+      name: title,
+      description,
+      url: site,
+    };
+---
+
+<html lang="zh-CN" class="scroll-smooth">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <meta name="description" content={description} />
+    <meta name="theme-color" content="#2563eb" />
+    <title>{title}</title>
+    <link rel="canonical" href={canonical} />
+    <link rel="alternate" type="application/rss+xml" title="RSS" href="/rss.xml" />
+    <link rel="manifest" href="/manifest.webmanifest" />
+    <meta property="og:site_name" content="我的博客" />
+    <meta property="og:title" content={title} />
+    <meta property="og:description" content={description} />
+    <meta property="og:type" content={ogType} />
+    <meta property="og:url" content={canonical} />
+    <meta property="og:image" content={ogImage} />
+    <meta name="twitter:card" content="summary_large_image" />
+    <meta name="twitter:title" content={title} />
+    <meta name="twitter:description" content={description} />
+    <meta name="twitter:image" content={ogImage} />
+    {isPost && (
+      <>
+        {publishDate && <meta property="article:published_time" content={new Date(publishDate).toISOString()} />}
+        {updatedDate && <meta property="article:modified_time" content={new Date(updatedDate).toISOString()} />}
+        {tags?.map((t) => (<meta property="article:tag" content={t} />))}
+        <script type="application/ld+json" set:html={JSON.stringify({
+          '@context': 'https://schema.org',
+          '@type': 'BreadcrumbList',
+          itemListElement: [
+            { '@type': 'ListItem', position: 1, name: '首页', item: site },
+            { '@type': 'ListItem', position: 2, name: '文章', item: new URL('/posts/', site).toString() },
+            { '@type': 'ListItem', position: 3, name: title, item: canonical },
+          ],
+        })}></script>
+      </>
+    )}
+    <script type="application/ld+json" set:html={JSON.stringify(jsonLd)}></script>
+  </head>
+  <body class="bg-white text-gray-900 dark:bg-gray-950 dark:text-gray-50">
+    <header class="border-b border-gray-200 dark:border-gray-800">
+      <nav class="max-w-3xl mx-auto px-4 h-14 flex items-center justify-between">
+        <a href="/" class="font-semibold">我的博客</a>
+        <div class="flex items-center gap-4 text-sm">
+          <a href="/tags/" class="hover:underline">标签</a>
+          <a href="/search/" class="hover:underline">搜索</a>
+          <a href="/rss.xml" class="hover:underline">RSS</a>
+          <button id="theme-toggle" class="rounded px-2 py-1 text-xs bg-gray-100 dark:bg-gray-800">切换主题</button>
+        </div>
+      </nav>
+    </header>
+    <main>
+      <slot />
+    </main>
+    <footer class="mt-16 py-10 text-center text-sm text-gray-500">
+      © {new Date().getFullYear()} 我的博客 · 由 Astro 驱动
+    </footer>
+    <script is:inline>
+      const key = 'theme';
+      const apply = (t) => {
+        if (t === 'dark') document.documentElement.classList.add('dark');
+        else document.documentElement.classList.remove('dark');
+      };
+      apply(localStorage.getItem(key) || (window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light'));
+      document.getElementById('theme-toggle')?.addEventListener('click', () => {
+        const next = document.documentElement.classList.contains('dark') ? 'light' : 'dark';
+        localStorage.setItem(key, next);
+        apply(next);
+      });
+      if ('serviceWorker' in navigator && !import.meta.env.DEV) {
+        window.addEventListener('load', () => navigator.serviceWorker.register('/sw.js').catch(() => {}));
+      }
+    </script>
+  </body>
+</html>

@@ -1,0 +1,8 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+/* Prose style tweaks */
+.prose img { @apply rounded; }
+.prose pre { @apply border border-gray-200 dark:border-gray-800; }
+.prose code { @apply text-sm; }
