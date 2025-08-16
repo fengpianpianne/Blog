@@ -2,8 +2,14 @@
 import BaseLayout from '@/layouts/BaseLayout.astro';
 import { getCollection } from 'astro:content';
 
-const posts = (await getCollection('posts', ({ data }) => !data.draft))
+const all = (await getCollection('posts', ({ data }) => !data.draft))
   .sort((a, b) => new Date(b.data.publishDate).getTime() - new Date(a.data.publishDate).getTime());
+const PER_PAGE = 10;
+const posts = all.slice(0, PER_PAGE);
+---
+
+---
+import Pagination from '@/components/Pagination.astro';
 ---
 
 <BaseLayout title="首页">
@@ -25,5 +31,12 @@ const posts = (await getCollection('posts', ({ data }) => !data.draft))
         </li>
       ))}
     </ul>
+    {all.length > PER_PAGE && (
+      <Pagination
+        current={1}
+        total={Math.ceil(all.length / PER_PAGE)}
+        makeHref={(p) => (p === 1 ? '/' : `/page/${p}/`)}
+      />
+    )}
   </section>
 </BaseLayout>

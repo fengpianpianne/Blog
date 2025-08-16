@@ -1,0 +1,36 @@
+---
+interface Props {
+  current: number;
+  total: number;
+  makeHref: (page: number) => string;
+}
+const { current, total, makeHref } = Astro.props as Props;
+const pages = Array.from({ length: total }, (_, i) => i + 1);
+const windowSize = 5;
+const start = Math.max(1, current - Math.floor(windowSize / 2));
+const end = Math.min(total, start + windowSize - 1);
+const visible = Array.from({ length: end - start + 1 }, (_, i) => start + i);
+---
+<nav class="mt-8 flex items-center justify-center gap-2 text-sm select-none" aria-label="分页">
+  {current > 1 && (
+    <a class="px-2 py-1 rounded hover:underline" href={makeHref(current - 1)} aria-label="上一页">←</a>
+  )}
+  {start > 1 && (
+    <>
+      <a class={`px-2 py-1 rounded ${current === 1 ? 'bg-primary-600 text-white' : 'hover:underline'}`} href={makeHref(1)}>1</a>
+      {start > 2 && <span class="px-2">…</span>}
+    </>
+  )}
+  {visible.map((p) => (
+    <a class={`px-2 py-1 rounded ${p === current ? 'bg-primary-600 text-white' : 'hover:underline'}`} href={makeHref(p)}>{p}</a>
+  ))}
+  {end < total && (
+    <>
+      {end < total - 1 && <span class="px-2">…</span>}
+      <a class={`px-2 py-1 rounded ${current === total ? 'bg-primary-600 text-white' : 'hover:underline'}`} href={makeHref(total)}>{total}</a>
+    </>
+  )}
+  {current < total && (
+    <a class="px-2 py-1 rounded hover:underline" href={makeHref(current + 1)} aria-label="下一页">→</a>
+  )}
+</nav>

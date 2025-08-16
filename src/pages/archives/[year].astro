@@ -3,24 +3,19 @@ import BaseLayout from '@/layouts/BaseLayout.astro';
 import { getCollection } from 'astro:content';
 
 export async function getStaticPaths() {
-  const posts = await getCollection('posts');
-  const tags = new Set(posts.flatMap((p) => p.data.tags || []));
-  return [...tags].map((tag) => ({ params: { tag } }));
+  const posts = await getCollection('posts', ({ data }) => !data.draft);
+  const years = new Set(posts.map((p) => new Date(p.data.publishDate).getFullYear()));
+  return [...years].map((year) => ({ params: { year: String(year) } }));
 }
 
-const { tag } = Astro.params;
-const all = (await getCollection('posts', ({ data }) => (data.tags || []).includes(tag!) && !data.draft))
+const year = Number(Astro.params.year);
+const posts = (await getCollection('posts', ({ data }) => !data.draft))
+  .filter((p) => new Date(p.data.publishDate).getFullYear() === year)
   .sort((a, b) => new Date(b.data.publishDate).getTime() - new Date(a.data.publishDate).getTime());
-const PER_PAGE = 10;
-const posts = all.slice(0, PER_PAGE);
 ---
-
----
-import Pagination from '@/components/Pagination.astro';
----
-<BaseLayout title={`标签：${tag}`}>
+<BaseLayout title={`归档：${year} 年`}>
   <section class="max-w-3xl mx-auto px-4 py-10">
-    <h1 class="text-3xl font-bold mb-6">标签：{tag}</h1>
+    <h1 class="text-3xl font-bold mb-6">{year} 年</h1>
     <ul class="space-y-6">
       {posts.map(({ slug, data }) => (
         <li class="border-b border-gray-200 dark:border-gray-800 pb-6">
@@ -30,12 +25,5 @@ import Pagination from '@/components/Pagination.astro';
         </li>
       ))}
     </ul>
-    {all.length > PER_PAGE && (
-      <Pagination
-        current={1}
-        total={Math.ceil(all.length / PER_PAGE)}
-        makeHref={(p) => (p === 1 ? `/tags/${tag}/` : `/tags/${tag}/page/${p}/`)}
-      />
-    )}
   </section>
 </BaseLayout>

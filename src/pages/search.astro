@@ -6,9 +6,10 @@ import BaseLayout from '@/layouts/BaseLayout.astro';
   <section class="max-w-3xl mx-auto px-4 py-10">
     <h1 class="text-3xl font-bold mb-6">搜索</h1>
     <div id="search" class="pagefind-search"></div>
+    <p class="mt-4 text-sm text-gray-500">提示：按 / 键快速聚焦搜索框。</p>
   </section>
   <script is:inline>
-    // 在构建后的静态环境中加载 Pagefind UI
+    // 在构建后的静态环境中加载 Pagefind UI，并添加快捷键
     (async () => {
       if (import.meta.env.DEV) return;
       const script = document.createElement('script');
@@ -19,7 +20,22 @@ import BaseLayout from '@/layouts/BaseLayout.astro';
           element: '#search',
           showSubResults: true,
           showImages: true,
-          translations: { placeholder: '搜索文章...' },
+          showFilters: true,
+          translations: {
+            placeholder: '搜索文章...',
+            zero_results: '未找到结果',
+            clear_search: '清空',
+            load_more: '加载更多',
+            search_label: '搜索',
+            filters_label: '筛选',
+          },
+        });
+        const input = document.querySelector('#search input');
+        window.addEventListener('keydown', (e) => {
+          if (e.key === '/' && document.activeElement !== input) {
+            e.preventDefault();
+            input?.focus();
+          }
         });
       };
       document.head.appendChild(script);

@@ -1,0 +1,24 @@
+---
+import BaseLayout from '@/layouts/BaseLayout.astro';
+import { getCollection } from 'astro:content';
+
+const posts = await getCollection('posts', ({ data }) => !data.draft);
+const years = new Map<number, number>();
+for (const p of posts) {
+  const y = new Date(p.data.publishDate).getFullYear();
+  years.set(y, (years.get(y) || 0) + 1);
+}
+const list = [...years.entries()].sort((a,b) => b[0] - a[0]);
+---
+<BaseLayout title="归档">
+  <section class="max-w-3xl mx-auto px-4 py-10">
+    <h1 class="text-3xl font-bold mb-6">归档</h1>
+    <ul class="space-y-3">
+      {list.map(([y, c]) => (
+        <li>
+          <a class="hover:underline" href={`/archives/${y}/`}>{y} 年（{c}）</a>
+        </li>
+      ))}
+    </ul>
+  </section>
+</BaseLayout>
