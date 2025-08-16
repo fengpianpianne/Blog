@@ -3,8 +3,9 @@ import tailwind from '@astrojs/tailwind';
 import mdx from '@astrojs/mdx';
 import sitemap from '@astrojs/sitemap';
 
-// Configure site URL via env: set SITE=https://your-domain in Cloudflare Pages (Preview/Production)
-const site = process.env.SITE;
+// SITE must be a fully qualified URL (e.g., https://your-domain). If invalid/missing, we omit it.
+const raw = process.env.SITE?.trim();
+let site; try { if (raw) { site = new URL(raw).toString(); } } catch {}
 
 export default defineConfig({
   ...(site ? { site } : {}),
