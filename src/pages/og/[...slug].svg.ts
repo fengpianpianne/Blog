@@ -7,7 +7,7 @@ export async function getStaticPaths() {
     'posts',
     (entry: CollectionEntry<'posts'>) => !entry.data.draft,
   );
-  return posts.map((p: CollectionEntry<'posts'>) => ({ params: { slug: p.slug.split('/') }, props: { post: p } }));
+  return posts.map((p: CollectionEntry<'posts'>) => ({ params: { slug: p.slug }, props: { post: p } }));
 }
 
 export const GET: APIRoute = async ({ props }) => {
