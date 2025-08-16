@@ -7,7 +7,7 @@ import TOC from '@/components/TOC.astro';
 
 export async function getStaticPaths() {
   const posts = await getCollection('posts');
-  return posts.filter((p) => !p.data.draft).map((p) => ({ params: { slug: p.slug.split('/') }, props: { post: p } }));
+  return posts.filter((p) => !p.data.draft).map((p) => ({ params: { slug: p.slug }, props: { post: p } }));
 }
 
 const { post } = Astro.props as { post: CollectionEntry<'posts'> };
