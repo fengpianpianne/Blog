@@ -7,7 +7,9 @@ import TOC from '@/components/TOC.astro';
 
 export async function getStaticPaths() {
   const posts = await getCollection('posts');
-  return posts.filter((p) => !p.data.draft).map((p) => ({ params: { slug: p.slug }, props: { post: p } }));
+  return posts
+    .filter((p) => !p.data.draft)
+    .map((p) => ({ params: { slug: p.slug.split('/').pop()! }, props: { post: p } }));
 }
 
 const { post } = Astro.props as { post: CollectionEntry<'posts'> };
@@ -61,12 +63,12 @@ const readingMinutes = Math.max(1, Math.ceil(words.trim().split(/\s+/).filter(Bo
       <nav class="mt-10 pt-6 border-t border-gray-200 dark:border-gray-800 flex justify-between text-sm">
         <div>
           {newer && (
-            <a href={`/posts/${newer.slug}/`} class="hover:underline">← 上一篇：{newer.data.title}</a>
+            <a href={`/posts/${newer.slug.split('/').pop()}/`} class="hover:underline">← 上一篇：{newer.data.title}</a>
           )}
         </div>
         <div>
           {older && (
-            <a href={`/posts/${older.slug}/`} class="hover:underline">下一篇：{older.data.title} →</a>
+            <a href={`/posts/${older.slug.split('/').pop()}/`} class="hover:underline">下一篇：{older.data.title} →</a>
           )}
         </div>
       </nav>

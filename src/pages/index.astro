@@ -12,7 +12,7 @@ const posts = (await getCollection('posts', ({ data }) => !data.draft))
     <ul class="space-y-6">
       {posts.map(({ id, slug, data }) => (
         <li class="border-b border-gray-200 dark:border-gray-800 pb-6">
-          <a href={`/posts/${slug}/`} class="text-xl font-semibold text-primary-600 hover:underline">{data.title}</a>
+          <a href={`/posts/${slug.split('/').pop()}/`} class="text-xl font-semibold text-primary-600 hover:underline">{data.title}</a>
           {data.description && <p class="mt-2 text-gray-600 dark:text-gray-300">{data.description}</p>}
           <p class="mt-2 text-sm text-gray-500">{new Date(data.publishDate).toLocaleDateString()}</p>
           {data.tags?.length > 0 && (

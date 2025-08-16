@@ -20,7 +20,7 @@ export const GET: APIRoute = async (context) => {
     items: posts.map((post: CollectionEntry<'posts'>) => ({
       title: post.data.title,
       description: post.data.description,
-      link: `/posts/${post.slug}/`,
+      link: `/posts/${post.slug.split('/').pop()}/`,
       pubDate: new Date(post.data.publishDate),
     })),
   });
