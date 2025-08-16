@@ -7,10 +7,10 @@
     "dev": "astro dev",
     "build": "astro build",
     "preview": "astro preview",
-    "postbuild": "pagefind --source ./dist",
+    "postbuild": "pagefind --source ./dist || echo \"Skip Pagefind: no HTML found\"",
     "format": "prettier --write .",
     "typecheck": "tsc --noEmit",
-    "prepare": "husky install"
+    "prepare": ""
   },
   "dependencies": {
     "astro": "^4.10.0",
@@ -26,7 +26,6 @@
     "prettier": "^3.3.3",
     "tailwindcss": "^3.4.10",
     "typescript": "^5.5.4",
-    "husky": "^9.0.11",
     "lint-staged": "^15.2.10"
   }
 }

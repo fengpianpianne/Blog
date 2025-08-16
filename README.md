@@ -13,6 +13,8 @@
 - GitHub Actions 示例工作流（CI 构建）
 
 ## 本地开发
+> 如果在提交时看到 WSL/bash 相关错误（如 execvpe(/bin/bash) failed），这是本地 Git 钩子残留导致。解决：删除本地仓库的 .git/hooks/pre-commit 或执行 `git config --unset core.hooksPath`，然后重新提交。仓库已移除 Husky 钩子，不会再自动生成。
+> 如果出现 “File astro/tsconfigs/strict not found”，本项目已改为使用本地 tsconfig.base.json，确保无需依赖外部预设。请执行 `npm install` 保证依赖完整。
 ```bash
 npm install
 npm run dev    # 启动：http://localhost:4321

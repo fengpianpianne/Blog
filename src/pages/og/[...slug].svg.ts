@@ -1,17 +1,21 @@
+import type { APIRoute } from 'astro';
 import { getCollection } from 'astro:content';
+import type { CollectionEntry } from 'astro:content';
 
 export async function getStaticPaths() {
-  const posts = await getCollection('posts', ({ data }) => !data.draft);
-  return posts.map((p) => ({ params: { slug: p.slug.split('/') }, props: { post: p } }));
+  const posts: CollectionEntry<'posts'>[] = await getCollection(
+    'posts',
+    (entry: CollectionEntry<'posts'>) => !entry.data.draft,
+  );
+  return posts.map((p: CollectionEntry<'posts'>) => ({ params: { slug: p.slug.split('/') }, props: { post: p } }));
 }
 
-export async function GET({ props }) {
-  const post = props.post;
+export const GET: APIRoute = async ({ props }) => {
+  const { post } = props as { post: CollectionEntry<'posts'> };
   const title = post.data.title ?? 'Post';
   const site = '我的博客';
   const width = 1200;
   const height = 630;
-  // Simple SVG template; safe for most crawlers (some platforms prefer PNG/JPG)
   const svg = `<?xml version="1.0" encoding="UTF-8"?>
   <svg xmlns="http://www.w3.org/2000/svg" width="${width}" height="${height}" viewBox="0 0 ${width} ${height}">
     <defs>
@@ -38,13 +42,13 @@ export async function GET({ props }) {
       'Cache-Control': 'public, max-age=31536000, immutable',
     },
   });
-}
+};
 
 function escapeHtml(s: string) {
   return s
     .replace(/&/g, '&amp;')
     .replace(/</g, '&lt;')
     .replace(/>/g, '&gt;')
-    .replace(/"/g, '&quot;')
+    .replace(/\"/g, '&quot;')
     .replace(/'/g, '&#39;');
 }
